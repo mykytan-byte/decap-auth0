@@ -32,11 +32,16 @@ export function getSortedPostsData(): PostData[] {
         // Use gray-matter to parse the post metadata section
         const matterResult = matter(fileContents);
 
+        const date = matterResult.data.date instanceof Date
+            ? matterResult.data.date.toISOString()
+            : matterResult.data.date;
+
         // Combine the data with the id
         return {
             id,
-            ...(matterResult.data as { date: string; title: string }),
-        };
+            ...matterResult.data,
+            date,
+        } as PostData;
     });
     // Sort posts by date
     return allPostsData.sort((a, b) => {
@@ -75,10 +80,15 @@ export async function getPostData(id: string): Promise<PostData> {
         .process(matterResult.content);
     const contentHtml = processedContent.toString();
 
+    const date = matterResult.data.date instanceof Date
+        ? matterResult.data.date.toISOString()
+        : matterResult.data.date;
+
     // Combine the data with the id and contentHtml
     return {
         id,
         contentHtml,
-        ...(matterResult.data as { date: string; title: string }),
-    };
+        ...matterResult.data,
+        date,
+    } as PostData;
 }
